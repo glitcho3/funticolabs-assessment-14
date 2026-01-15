@@ -44,16 +44,9 @@ function printResult(label, ok, details = '') {
   console.log(`  ${label}: ${status}${details ? ` (${details})` : ''}`);
 }
 
-// Test runner
-
 async function runTests() {
-  console.log('\n==============================');
-  console.log('API INTEGRATION TESTS');
-  console.log('Contracts endpoints');
-  console.log('==============================\n');
-
-
-  console.log('Preflight checks');
+  console.log('INTEGRATION TESTS');
+  console.log('contract facing endpoints');
 
   printResult(
     'Deploy info present',
@@ -70,7 +63,6 @@ async function runTests() {
   console.log('');
 
   // Test 1: GET /contracts/                                       
-
   console.log('Test 1: GET /contracts/');
   const res1 = await safeGet('/contracts/');
 
@@ -85,7 +77,6 @@ async function runTests() {
   console.log('');
 
   // Test 2: GET /contracts/count                                  
-
   console.log('Test 2: GET /contracts/count');
   const res2 = await safeGet('/contracts/count');
 
@@ -100,7 +91,6 @@ async function runTests() {
 
 
   // Test 3: GET /contracts/by-address/:address                    
-
   if (deployInfo && deployInfo.deployedTo) {
     console.log('Test 3: GET /contracts/by-address/:address');
 
