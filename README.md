@@ -5,6 +5,15 @@ This submission addresses critical security vulnerabilities and missing function
 
 ## Changes Made
 
+### 0. Docker Usage
+
+This application is containerized to provide a consistent, isolated environment for running the API and Solidity tests, ensuring all dependencies and configurations work the same across machines. To build and run the container:
+
+```bash
+docker build -t defi-property .
+docker run -it --read-only=false -u 1000:1000 -p 3000:3000 -p 5001:5001 defi-property
+
+
 ### 1. Smart Contract Security Fixes
 
 #### Critical Issues Resolved
