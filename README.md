@@ -12,6 +12,9 @@ This application is containerized to provide a consistent, isolated environment 
 ```bash
 docker build -t defi-property .
 docker run -it --read-only=false -u 1000:1000 -p 3000:3000 -p 5001:5001 defi-property
+``` 
+
+The container starts the app and runs API tests automatically, exposing ports 3000 and 5001 for interaction, while running as a non-root user to maintain security.
 
 
 ### 1. Smart Contract Security Fixes
