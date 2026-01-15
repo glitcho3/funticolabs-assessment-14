@@ -3,55 +3,124 @@ const fs = require('fs');
 const path = require('path');
 const app = require('../../app');
 
-const deployInfoPath = path.join(__dirname, '../../../solidity/deploy-info/deploy-localnet.json');
+const deployInfoPath = path.join(
+  __dirname,
+  '../../../solidity/deploy-info/deploy-localnet.json'
+);
 
-const abiPath = path.join(__dirname, '../../../solidity/build/Factory.sol/Factory.json');
-const abiJson = JSON.parse(fs.readFileSync(abiPath, 'utf8'));
-const contractABI = abiJson.abi;
-// Carga del deploy info
-const deployInfo = fs.existsSync(deployInfoPath) 
-  ? JSON.parse(fs.readFileSync(deployInfoPath, 'utf8'))
-  : null;
+const abiPath = path.join(
+  __dirname,
+  '../../../solidity/build/Factory.sol/Factory.json'
+);
 
-// Helper para capturar errores de llamadas a la API
+let deployInfo = null;
+let contractABI = null;
+
+if (fs.existsSync(deployInfoPath)) {
+  deployInfo = JSON.parse(fs.readFileSync(deployInfoPath, 'utf8'));
+}
+
+if (fs.existsSync(abiPath)) {
+  const abiJson = JSON.parse(fs.readFileSync(abiPath, 'utf8'));
+  contractABI = abiJson.abi;
+}
+
+
 async function safeGet(url) {
   try {
     return await request(app).get(url);
   } catch (err) {
-    console.error(`SAFE GET ${url} failed:`, err.message || err.reason);
-    return { statusCode: 500, body: {} };
+    return {
+      statusCode: 500,
+      body: {
+        error: err.message || 'Unhandled request error',
+      },
+    };
   }
 }
 
-async function runTests() {
-  console.log('Starting API tests...\n');
-  console.log('Testing Contracts API\n');
+function printResult(label, ok, details = '') {
+  const status = ok ? 'PASS' : 'FAIL';
+  console.log(`  ${label}: ${status}${details ? ` (${details})` : ''}`);
+}
 
-  // Test 1: GET /contracts/
+// Test runner
+
+async function runTests() {
+  console.log('\n==============================');
+  console.log('API INTEGRATION TESTS');
+  console.log('Contracts endpoints');
+  console.log('==============================\n');
+
+
+  console.log('Preflight checks');
+
+  printResult(
+    'Deploy info present',
+    !!deployInfo,
+    deployInfo ? `address=${deployInfo.deployedTo}` : 'deploy-localnet.json missing'
+  );
+
+  printResult(
+    'Contract ABI present',
+    !!contractABI,
+    contractABI ? `entries=${contractABI.length}` : 'Factory.json missing'
+  );
+
+  console.log('');
+
+  // Test 1: GET /contracts/                                       
+
   console.log('Test 1: GET /contracts/');
   const res1 = await safeGet('/contracts/');
-  console.log(`  Status: ${res1.statusCode} [${res1.statusCode === 200 ? 'PASS' : 'FAIL'}]`);
-  console.log(`  Is Array: ${Array.isArray(res1.body) ? 'PASS' : 'FAIL'}`);
-  console.log(`  Contracts: ${res1.body.length || 0}\n`);
 
-  // Test 2: GET /contracts/count
+  printResult('HTTP 200', res1.statusCode === 200, `status=${res1.statusCode}`);
+  printResult('Body is array', Array.isArray(res1.body));
+  printResult(
+    'Contracts length readable',
+    Array.isArray(res1.body),
+    Array.isArray(res1.body) ? `length=${res1.body.length}` : 'invalid body'
+  );
+
+  console.log('');
+
+  // Test 2: GET /contracts/count                                  
+
   console.log('Test 2: GET /contracts/count');
   const res2 = await safeGet('/contracts/count');
-  console.log(`  Status: ${res2.statusCode} [${res2.statusCode === 200 ? 'PASS' : 'FAIL'}]`);
-  console.log(`  Count: ${res2.body.count || 0} [${typeof res2.body.count === 'number' ? 'PASS' : 'FAIL'}]\n`);
 
-  // Test 3: GET /contracts/by-address/:address
+  printResult('HTTP 200', res2.statusCode === 200, `status=${res2.statusCode}`);
+  printResult(
+    'Count is number',
+    typeof res2.body.count === 'number',
+    `count=${res2.body.count}`
+  );
+
+  console.log('');
+
+
+  // Test 3: GET /contracts/by-address/:address                    
+
   if (deployInfo && deployInfo.deployedTo) {
     console.log('Test 3: GET /contracts/by-address/:address');
-    const res4 = await safeGet(`/contracts/by-address/${deployInfo.deployedTo}`);
-    console.log(`  Status: ${res4.statusCode} [${res4.statusCode === 200 ? 'PASS' : 'FAIL'}]`);
-    console.log(`  Has instance: ${res4.body.instance ? 'PASS' : 'FAIL'}\n`);
+
+    const res3 = await safeGet(
+      `/contracts/by-address/${deployInfo.deployedTo}`
+    );
+
+    printResult('HTTP 200', res3.statusCode === 200, `status=${res3.statusCode}`);
+    printResult(
+      'Instance present',
+      !!res3.body.instance,
+      res3.body.instance ? 'instance found' : 'no instance'
+    );
+
+    console.log('');
   } else {
-    console.log('Test 4: SKIPPED: no deployed address\n');
+    console.log('Test 3: SKIPPED (no deployed contract address)\n');
   }
 
-  console.log('All tests completed\n');
-  process.exit(0);
+   process.exit(0);
 }
 
 runTests();
