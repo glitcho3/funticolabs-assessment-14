@@ -140,24 +140,27 @@ npm run api-sc-test
 > defi-property@0.1.11 api-sc-test
 > node server/tests/api/contracts.test.js
 
-Starting API tests...
 
-Testing Contracts API
+API INTEGRATION TESTS
+Contracts endpoints
+
+Preflight checks
+  Deploy info present: PASS (address=ADDRESS)
+  Contract ABI present: PASS (entries=5)
 
 Test 1: GET /contracts/
-  Status: 200 [PASS]
-  Is Array: PASS
-  Contracts: 0
+  HTTP 200: PASS (status=200)
+  Body is array: PASS
+  Contracts length readable: PASS (length=0)
 
 Test 2: GET /contracts/count
-  Status: 200 [PASS]
-  Count: 0 [PASS]
+  HTTP 200: PASS (status=200)
+  Count is number: PASS (count=0)
 
 Test 3: GET /contracts/by-address/:address
-  Status: 200 [PASS]
-  Has instance: PASS
-
-All tests completed
+  HTTP 200: PASS (status=200)
+  Instance present: PASS (instance found)
+  
 ```
 
 
