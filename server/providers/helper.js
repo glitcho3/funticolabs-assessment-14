@@ -17,8 +17,9 @@ module.exports = {
     }
     else return Date.now();
   },
+
   isKeyMissing: (data, requiredArray) => {
-    for (element of requiredArray) {
+    for (const element of requiredArray) {
       if (!data[element]) {
         return element
       }

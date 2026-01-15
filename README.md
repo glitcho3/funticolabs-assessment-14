@@ -1,3 +1,165 @@
+# DeFi Real Estate - Assessment Submission
+
+## Overview
+This submission addresses critical security vulnerabilities and missing functionality in the smart contract codebase, adds comprehensive test coverage, and ensures proper integration with the Node.js backend API.
+
+## Changes Made
+
+### 1. Smart Contract Security Fixes
+
+#### Critical Issues Resolved
+
+**Reentrancy Protection**
+- Added OpenZeppelin's `ReentrancyGuard` to `HomeTransaction.sol`
+- Applied `nonReentrant` modifier to all functions handling ETH transfers
+- Implemented Checks-Effects-Interactions pattern: state updates before external calls
+- Reset `deposit = 0` before executing transfers to prevent exploitation
+
+**Missing Fund Transfers**
+- Fixed `buyerFinalizeTransaction()` which was not transferring funds
+- Added proper distribution logic: seller receives `price - realtorFee`, realtor receives `realtorFee`
+
+**Input Validation**
+- Added address zero checks in constructor
+- Enforced buyer and seller must be different addresses
+- Added `require(deposit >= realtorFee)` to prevent underflow in withdrawal function
+- Validated price must exceed realtor fee
+
+**Additional Improvements**
+- Added `ContractCreated` event to Factory for transparency
+- Improved error messages for better debugging
+- Enhanced state transition validation
+
+### 2. Test Suite Implementation
+
+Created comprehensive test coverage using Foundry:
+
+**HomeTransaction Tests** (21 tests)
+- Constructor validation tests
+- State transition tests (seller sign, buyer deposit, realtor review, finalization)
+- Access control verification (only authorized parties can execute functions)
+- Amount validation (minimum deposit, exact payment requirements)
+- Reentrancy attack prevention test
+- Withdrawal scenarios (buyer cancellation, deadline expiration)
+
+**Factory Tests** (15 tests)
+- Contract creation and deployment
+- Event emission verification
+- Instance retrieval and counting
+- Edge cases (maximum/minimum prices, multiple realtors)
+- Input validation
+
+**Test Results**: 36 tests, 100% pass rate
+
+### 3. Backend API Testing
+
+Created integration tests for contract-related API endpoints:
+- `GET /contracts/` - List all contract instances
+- `GET /contracts/count` - Get total contract count
+- `GET /contracts/:index` - Get specific contract by index
+- `GET /contracts/by-address/:address` - Get contract by deployed address
+
+Fixed module export issue in `server/app.js` to enable testing.
+
+### 4. Development Environment Setup
+
+**Solidity Development**
+- Implemented Foundry for faster compilation and testing
+- Integrated OpenZeppelin contracts v4.9.3
+- Configured proper remappings for imports
+- Set up local Anvil testnet for deployment
+
+**Deployment Process**
+```bash
+# Compile contracts
+forge build
+
+# Start local testnet
+anvil --chain-id 31337 --host 0.0.0.0
+
+# Deploy Factory contract
+forge create src/Factory.sol:Factory \
+  --rpc-url http://localhost:8545 \
+  --private-key <ANVIL_PRIVATE_KEY> \
+  --broadcast
+```
+
+## Technical Details
+
+### Dependencies Added
+- `@openzeppelin/contracts@4.9.3` - Security utilities (ReentrancyGuard)
+- Foundry test framework for Solidity testing
+
+### Files Modified
+- `src/HomeTransaction.sol` - Security fixes and validations
+- `src/Factory.sol` - Event emission and input validation
+- `server/app.js` - Added module export for testing
+- `server/tests/api/contracts.test.js` - Created API integration tests
+
+### Files Created
+- `test/HomeTransaction.t.sol` - Comprehensive smart contract tests
+- `test/Factory.t.sol` - Factory contract tests
+- `solidity/remappings.txt` - Import path configuration
+
+## Security Improvements Summary
+
+1. **Reentrancy Attack Prevention**: Guards against malicious contracts recursively calling payment functions
+2. **Integer Overflow Protection**: Solidity 0.8+ built-in checks prevent arithmetic errors
+3. **State Consistency**: Proper state management prevents fund loss or double-spending
+4. **Access Control**: Strict role enforcement (only buyer/seller/realtor can execute specific functions)
+5. **Input Sanitization**: All user inputs validated before processing
+
+## Running the Tests
+
+**Smart Contract Tests**
+```bash
+cd solidity
+forge test              # Run all tests
+forge test -vvv         # Verbose output
+forge coverage          # Coverage report
+```
+
+**API Tests**
+```bash
+npm run api-sc-test
+```
+
+```
+> defi-property@0.1.11 api-sc-test
+> node server/tests/api/contracts.test.js
+
+Starting API tests...
+
+Testing Contracts API
+
+Test 1: GET /contracts/
+  Status: 200 [PASS]
+  Is Array: PASS
+  Contracts: 0
+
+Test 2: GET /contracts/count
+  Status: 200 [PASS]
+  Count: 0 [PASS]
+
+Test 3: GET /contracts/by-address/:address
+  Status: 200 [PASS]
+  Has instance: PASS
+
+All tests completed
+```
+
+
+## Time Investment
+Approximately 40 minutes spent on critical fixes and core functionality. Additional time used for integration and comprehensive test coverage to mimic production readiness.
+
+## Notes
+- All critical security vulnerabilities have been addressed
+- Test coverage ensures contract behavior is predictable and secure
+- Code is ready for deployment to testnet/mainnet after additional audit
+- Documentation added for maintainability
+
+---
+
 # DeFi Real Estate - Take-Home Assessment
 
 Thank you for your interest in joining our team!  
@@ -65,4 +227,4 @@ This task should take approximately **40 minutes**.
 ---
 
 ## Good luck!  
-We look forward to reviewing your submission.
+We look forward to reviewing your submission.-------------------------

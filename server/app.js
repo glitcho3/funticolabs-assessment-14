@@ -26,6 +26,8 @@ const auth = require('./routes/auth');
 const common = require('./routes/common');
 const property = require('./routes/property');
 const email = require('./routes/email');
+const contracts = require('./routes/contracts');
+
 
 app.get('/', (req, res) => { res.status(200).send('Success'); });
 
@@ -34,9 +36,19 @@ app.use('/api/auth', auth);
 app.use('/api/common', common);
 app.use('/api/property', property);
 app.use('/api/email', email);
+app.use('/contracts', contracts);
 
+module.exports = app;
+
+//const PORT = process.env.PORT || 5001;
+//
+//server.listen(PORT, () => {
+//  console.log(`Server running on port ${PORT}`);
+//});
 const PORT = process.env.PORT || 5001;
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if (require.main === module) {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}

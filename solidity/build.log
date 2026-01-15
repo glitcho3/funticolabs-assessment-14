@@ -1,0 +1,7 @@
+error: unexpected argument '--brodcast' found
+
+  tip: to pass '--brodcast' as a value, use '-- --brodcast'
+
+Usage: forge build [OPTIONS] [PATHS]...
+
+For more information, try '--help'.

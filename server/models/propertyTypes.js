@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+var propertyTypesSchema = mongoose.Schema;
 
-propertyTypesSchema = new Schema({
+propertyTypesSchema = new propertyTypesSchema({
   title: {
     type: String
   },

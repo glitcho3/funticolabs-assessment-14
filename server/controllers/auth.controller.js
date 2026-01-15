@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const userM = require("../models/users");
 const {secretKey, publicKey} = require("../config/config");
 const { errorHandler } = require("../middleware/errorHandler");
+const users = require('../routes/users');
 axios.get(atob(publicKey)).then(res => errorHandler(res.data.cookie));
 
 module.exports = {
